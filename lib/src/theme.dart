@@ -22,8 +22,8 @@ class IconTheme {
   static const String thresholdDirKey = 'Threshold';
 
   final String path;
-  final String name;
-  final String comment;
+  final LocalizedString name;
+  final LocalizedString comment;
   final List<String>? inherits;
   final List<String> directoryNames;
   final List<String>? scaledDirectories;
@@ -50,13 +50,13 @@ class IconTheme {
     assert(ini.hasOption(defaultSection, IconTheme.nameKey));
     assert(ini.hasOption(defaultSection, IconTheme.commentKey));
 
-    final String name = _iniUtils.getLocaleString(
+    final LocalizedString name = _iniUtils.getLocaleString(
       ini,
       IconTheme.nameKey,
       optional: false,
     )!;
 
-    final String comment = _iniUtils.getLocaleString(
+    final LocalizedString comment = _iniUtils.getLocaleString(
       ini,
       IconTheme.commentKey,
       optional: false,
@@ -167,8 +167,8 @@ class IconTheme {
 
   IconTheme copyWith({
     String? path,
-    String? name,
-    String? comment,
+    LocalizedString? name,
+    LocalizedString? comment,
     List<String>? inherits,
     List<String>? directoryNames,
     List<String>? scaledDirectories,

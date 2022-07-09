@@ -33,11 +33,11 @@ class DesktopEntry {
 
   final DesktopEntryType type;
   final String? version;
-  final String name;
-  final String? genericName;
+  final LocalizedString name;
+  final LocalizedString? genericName;
   final bool? noDisplay;
-  final String? comment;
-  final String? icon;
+  final LocalizedString? comment;
+  final LocalizedString? icon;
   final bool? hidden;
   final List<String>? onlyShowIn;
   final List<String>? notShowIn;
@@ -106,13 +106,13 @@ class DesktopEntry {
       DesktopEntry.versionKey,
     );
 
-    final String name = _iniUtils.getLocaleString(
+    final LocalizedString name = _iniUtils.getLocaleString(
       ini,
       DesktopEntry.nameKey,
       optional: false,
     )!;
 
-    final String? genericName = _iniUtils.getLocaleString(
+    final LocalizedString? genericName = _iniUtils.getLocaleString(
       ini,
       DesktopEntry.genericNameKey,
     );
@@ -122,12 +122,12 @@ class DesktopEntry {
       DesktopEntry.noDisplayKey,
     );
 
-    final String? comment = _iniUtils.getLocaleString(
+    final LocalizedString? comment = _iniUtils.getLocaleString(
       ini,
       DesktopEntry.commentKey,
     );
 
-    final String? icon = _iniUtils.getLocaleString(
+    final LocalizedString? icon = _iniUtils.getLocaleString(
       ini,
       DesktopEntry.iconKey,
     );
@@ -317,7 +317,7 @@ class DesktopEntry {
       ini,
       DesktopEntry.defaultSection,
       DesktopEntry.nameKey,
-      name,
+      name.main,
       stringConverter,
     );
 
@@ -325,7 +325,7 @@ class DesktopEntry {
       ini,
       DesktopEntry.defaultSection,
       DesktopEntry.genericNameKey,
-      genericName,
+      genericName?.main,
       stringConverter,
     );
 
@@ -341,7 +341,7 @@ class DesktopEntry {
       ini,
       DesktopEntry.defaultSection,
       DesktopEntry.commentKey,
-      comment,
+      comment?.main,
       stringConverter,
     );
 
@@ -349,7 +349,7 @@ class DesktopEntry {
       ini,
       DesktopEntry.defaultSection,
       DesktopEntry.iconKey,
-      icon,
+      icon?.main,
       stringConverter,
     );
 
