@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:ini/ini.dart';
 import 'package:xdg_desktop/src/ini.dart';
 
@@ -187,6 +188,38 @@ class IconTheme {
       example: example ?? this.example,
       directories: directories ?? this.directories,
     );
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        path,
+        name,
+        comment,
+        inherits,
+        directoryNames,
+        scaledDirectories,
+        hidden,
+        example,
+        directories,
+      );
+
+  @override
+  bool operator ==(Object other) {
+    if (other is IconTheme) {
+      final ListEquality eq = ListEquality();
+
+      return path == other.path &&
+          name == other.name &&
+          comment == other.comment &&
+          eq.equals(inherits, other.inherits) &&
+          eq.equals(directoryNames, other.directoryNames) &&
+          eq.equals(scaledDirectories, other.scaledDirectories) &&
+          hidden == other.hidden &&
+          example == other.example &&
+          eq.equals(directories, other.directories);
+    }
+
+    return false;
   }
 }
 
