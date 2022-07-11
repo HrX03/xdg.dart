@@ -6,6 +6,16 @@ class IconTheme {
   static const String defaultSection = "Icon Theme";
   static const IniUtils _iniUtils = IniUtils(defaultSection);
 
+  static const List<String> keys = [
+    nameKey,
+    commentKey,
+    inheritsKey,
+    directoriesKey,
+    scaledDirectoriesKey,
+    hiddenKey,
+    exampleKey,
+  ];
+
   static const String nameKey = 'Name';
   static const String commentKey = 'Comment';
   static const String inheritsKey = 'Inherits';
@@ -13,14 +23,6 @@ class IconTheme {
   static const String scaledDirectoriesKey = 'ScaledDirectories';
   static const String hiddenKey = 'Hidden';
   static const String exampleKey = 'Example';
-
-  static const String sizeDirKey = 'Size';
-  static const String scaleDirKey = 'Scale';
-  static const String contextDirKey = 'Context';
-  static const String typeDirKey = 'Type';
-  static const String minSizeDirKey = 'MinSize';
-  static const String maxSizeDirKey = 'MaxSize';
-  static const String thresholdDirKey = 'Threshold';
 
   final String path;
   final LocalizedString name;
@@ -31,6 +33,7 @@ class IconTheme {
   final bool? hidden;
   final String? example;
   final List<IconThemeDirectory> directories;
+  final Map<String, String> extra;
 
   const IconTheme({
     required this.path,
@@ -42,6 +45,7 @@ class IconTheme {
     this.hidden,
     this.example,
     required this.directories,
+    this.extra = const {},
   });
 
   factory IconTheme.fromIni(String path, String content) {
@@ -97,44 +101,44 @@ class IconTheme {
 
       final int size = _iniUtils.getInteger(
         ini,
-        IconTheme.sizeDirKey,
+        IconThemeDirectory.sizeKey,
         group: directory,
         optional: false,
       )!;
 
       final int? scale = _iniUtils.getInteger(
         ini,
-        IconTheme.scaleDirKey,
+        IconThemeDirectory.scaleKey,
         group: directory,
       );
 
       final String? context = _iniUtils.getString(
         ini,
-        IconTheme.contextDirKey,
+        IconThemeDirectory.contextKey,
         group: directory,
       );
 
       final String? type = _iniUtils.getString(
         ini,
-        IconTheme.typeDirKey,
+        IconThemeDirectory.typeKey,
         group: directory,
       );
 
       final int? maxSize = _iniUtils.getInteger(
         ini,
-        IconTheme.maxSizeDirKey,
+        IconThemeDirectory.maxSizeKey,
         group: directory,
       );
 
       final int? minSize = _iniUtils.getInteger(
         ini,
-        IconTheme.minSizeDirKey,
+        IconThemeDirectory.minSizeKey,
         group: directory,
       );
 
       final int? threshold = _iniUtils.getInteger(
         ini,
-        IconTheme.thresholdDirKey,
+        IconThemeDirectory.thresholdKey,
         group: directory,
       );
 
@@ -153,6 +157,9 @@ class IconTheme {
       );
     }
 
+    final List<String> extraOptions = ini.options(defaultSection)!.toList();
+    extraOptions.removeWhere((e) => keys.contains(e));
+
     return IconTheme(
       path: path,
       name: name,
@@ -163,6 +170,10 @@ class IconTheme {
       hidden: hidden,
       example: example,
       directories: List.unmodifiable(directories),
+      extra: Map.fromIterables(
+        extraOptions,
+        extraOptions.map((e) => ini.get(defaultSection, e)!),
+      ),
     );
   }
 
@@ -176,6 +187,7 @@ class IconTheme {
     bool? hidden,
     String? example,
     List<IconThemeDirectory>? directories,
+    Map<String, String>? extra,
   }) {
     return IconTheme(
       path: path ?? this.path,
@@ -187,6 +199,7 @@ class IconTheme {
       hidden: hidden ?? this.hidden,
       example: example ?? this.example,
       directories: directories ?? this.directories,
+      extra: extra ?? this.extra,
     );
   }
 
@@ -201,6 +214,7 @@ class IconTheme {
         hidden,
         example,
         directories,
+        extra,
       );
 
   @override
@@ -216,7 +230,8 @@ class IconTheme {
           eq.equals(scaledDirectories, other.scaledDirectories) &&
           hidden == other.hidden &&
           example == other.example &&
-          eq.equals(directories, other.directories);
+          eq.equals(directories, other.directories) &&
+          extra == other.extra;
     }
 
     return false;
@@ -224,6 +239,14 @@ class IconTheme {
 }
 
 class IconThemeDirectory {
+  static const String sizeKey = 'Size';
+  static const String scaleKey = 'Scale';
+  static const String contextKey = 'Context';
+  static const String typeKey = 'Type';
+  static const String minSizeKey = 'MinSize';
+  static const String maxSizeKey = 'MaxSize';
+  static const String thresholdKey = 'Threshold';
+
   final String name;
   final int size;
   final int? scale;

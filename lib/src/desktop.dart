@@ -5,6 +5,34 @@ class DesktopEntry {
   static const String defaultSection = "Desktop Entry";
   static const IniUtils _iniUtils = IniUtils(defaultSection);
 
+  static const List<String> keys = [
+    typeKey,
+    versionKey,
+    nameKey,
+    genericNameKey,
+    noDisplayKey,
+    commentKey,
+    iconKey,
+    hiddenKey,
+    onlyShowInKey,
+    notShowInKey,
+    dbusActivatableKey,
+    tryExecKey,
+    execKey,
+    pathKey,
+    terminalKey,
+    actionsKey,
+    mimeTypeKey,
+    categoriesKey,
+    implementsKey,
+    keywordsKey,
+    startupNotifyKey,
+    startupWmClassKey,
+    urlKey,
+    prefersNonDefaultGpuKey,
+    singleMainWindowKey,
+  ];
+
   static const String typeKey = 'Type';
   static const String versionKey = 'Version';
   static const String nameKey = 'Name';
@@ -56,6 +84,7 @@ class DesktopEntry {
   final String? url;
   final bool? prefersNonDefaultGpu;
   final bool? singleMainWindow;
+  final Map<String, String> extra;
 
   final List<DesktopEntryAction>? actionSections;
 
@@ -86,6 +115,7 @@ class DesktopEntry {
     this.prefersNonDefaultGpu,
     this.singleMainWindow,
     this.actionSections,
+    this.extra = const {},
   });
 
   factory DesktopEntry.fromIni(String content) {
@@ -235,14 +265,14 @@ class DesktopEntry {
 
       final String id = section.replaceFirst('Desktop Action ', '');
 
-      final String actionName = _iniUtils.getString(
+      final LocalizedString actionName = _iniUtils.getLocaleString(
         ini,
         DesktopEntry.nameKey,
         group: section,
         optional: false,
       )!;
 
-      final String? actionIcon = _iniUtils.getString(
+      final LocalizedString? actionIcon = _iniUtils.getLocaleString(
         ini,
         DesktopEntry.iconKey,
         group: section,
@@ -261,6 +291,9 @@ class DesktopEntry {
         exec: actionExec,
       ));
     }
+
+    final List<String> extraOptions = ini.options(defaultSection)!.toList();
+    extraOptions.removeWhere((e) => keys.contains(e));
 
     return DesktopEntry(
       type: type,
@@ -289,6 +322,10 @@ class DesktopEntry {
       prefersNonDefaultGpu: prefersNonDefaultGpu,
       singleMainWindow: singleMainWindow,
       actionSections: actionSections,
+      extra: Map.fromIterables(
+        extraOptions,
+        extraOptions.map((e) => ini.get(defaultSection, e)!),
+      ),
     );
   }
 
@@ -505,7 +542,7 @@ class DesktopEntry {
         ini,
         section,
         DesktopEntry.nameKey,
-        action.name,
+        action.name.main,
         stringConverter,
       );
 
@@ -513,7 +550,7 @@ class DesktopEntry {
         ini,
         section,
         DesktopEntry.iconKey,
-        action.icon,
+        action.icon?.main,
         stringConverter,
       );
 
@@ -574,8 +611,8 @@ class DesktopEntry {
 
 class DesktopEntryAction {
   final String id;
-  final String name;
-  final String? icon;
+  final LocalizedString name;
+  final LocalizedString? icon;
   final String? exec;
 
   const DesktopEntryAction({
