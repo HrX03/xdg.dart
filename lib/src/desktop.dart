@@ -78,7 +78,7 @@ class DesktopEntry {
   final List<String>? mimeType;
   final List<String>? categories;
   final List<String>? implements;
-  final List<String>? keywords;
+  final LocalizedList? keywords;
   final bool? startupNotify;
   final String? startupWmClass;
   final String? url;
@@ -222,7 +222,7 @@ class DesktopEntry {
       DesktopEntry.implementsKey,
     );
 
-    final List<String>? keywords = _iniUtils.getList(
+    final LocalizedList? keywords = _iniUtils.getLocalizedList(
       ini,
       DesktopEntry.keywordsKey,
     );
@@ -490,7 +490,7 @@ class DesktopEntry {
       ini,
       DesktopEntry.defaultSection,
       DesktopEntry.keywordsKey,
-      keywords,
+      keywords?.main,
       listConverter,
     );
 
@@ -589,7 +589,7 @@ class DesktopEntry {
     List<String>? mimeType,
     List<String>? categories,
     List<String>? implements,
-    List<String>? keywords,
+    LocalizedList? keywords,
     bool? startupNotify,
     String? startupWmClass,
     String? url,

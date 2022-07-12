@@ -141,6 +141,64 @@ class IniUtils {
     return list;
   }
 
+  LocalizedList? getLocalizedList(
+    Config ini,
+    String key, {
+    String? group,
+    bool optional = true,
+  }) {
+    group ??= defaultSection;
+    final List<String>? main = getList(
+      ini,
+      key,
+      group: group,
+      optional: optional,
+    );
+
+    if (main == null) return null;
+
+    final List<String>? localizedOptions = ini
+        .options(group)
+        ?.where(
+          (e) => e.startsWith(_getLocaleStringRegex(key)),
+        )
+        .toList();
+
+    final Map<XdgLocale, List<String>> localizedLists = {};
+    if (localizedOptions != null && localizedOptions.isNotEmpty) {
+      for (final String localizedOption in localizedOptions) {
+        final List<String>? value = getList(
+          ini,
+          localizedOption,
+          group: group,
+          optional: optional,
+        );
+
+        if (value == null) continue;
+        final RegExpMatch? match =
+            _getLocaleStringRegex(key).firstMatch(localizedOption);
+
+        if (match == null) continue;
+
+        final String? language = match.namedGroup("language");
+        final String? country = match.namedGroup("country");
+        final String? modifier = match.namedGroup("modifier");
+
+        if (language == null) continue;
+
+        final XdgLocale locale = XdgLocale(
+          language,
+          country,
+          modifier,
+        );
+
+        localizedLists[locale] = value;
+      }
+    }
+
+    return LocalizedList(main, localized: localizedLists);
+  }
+
   bool? getBool(
     Config ini,
     String key, {
@@ -289,11 +347,14 @@ String? listConverter(List<String>? arg) {
   return "${arg.join(";")};";
 }
 
-class LocalizedString {
-  final String main;
-  final Map<XdgLocale, String> localized;
+typedef LocalizedString = LocalizedResource<String>;
+typedef LocalizedList = LocalizedResource<List<String>>;
 
-  const LocalizedString(
+class LocalizedResource<T> {
+  final T main;
+  final Map<XdgLocale, T> localized;
+
+  const LocalizedResource(
     this.main, {
     this.localized = const {},
   });
@@ -305,7 +366,7 @@ class LocalizedString {
     return "$main {${values.join(", ")}}";
   }
 
-  String getForLocale(XdgLocale locale) {
+  T getForLocale(XdgLocale locale) {
     if (localized.isNotEmpty) {
       XdgLocale? closestLocale;
 

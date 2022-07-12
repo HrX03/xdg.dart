@@ -5,20 +5,34 @@ import 'package:xdg_desktop/xdg_desktop.dart';
 
 void main(List<String> arguments) async {
   final String path = arguments.first;
-  final List<FileSystemEntity> entities =
-      await Directory(path).list(recursive: true).toList();
+  final FileSystemEntityType type = FileSystemEntity.typeSync(path);
 
-  for (final FileSystemEntity entity in entities) {
-    if (entity is! File) continue;
-    if (extension(entity.path) != ".desktop") continue;
+  switch (type) {
+    case FileSystemEntityType.directory:
+      final List<FileSystemEntity> entities =
+          await Directory(path).list(recursive: true).toList();
 
-    final String content = await entity.readAsString();
-    try {
-      final DesktopEntry entry = DesktopEntry.fromIni(content);
-      if (entry.noDisplay != true) print(entry.name);
-    } catch (e) {
-      print(e);
-      print('e: ${entity.path}');
-    }
+      entities.forEach(_parseFile);
+      break;
+    case FileSystemEntityType.file:
+      _parseFile(File(path));
+      break;
+    default:
+      print("Entity not supported");
+      break;
+  }
+}
+
+Future<void> _parseFile(FileSystemEntity entity) async {
+  if (entity is! File) return;
+  if (extension(entity.path) != ".desktop") return;
+
+  final String content = await entity.readAsString();
+  try {
+    final DesktopEntry entry = DesktopEntry.fromIni(content);
+    if (entry.noDisplay != true) print(entry.name);
+  } catch (e) {
+    print(e);
+    print('e: ${entity.path}');
   }
 }
