@@ -1,4 +1,5 @@
 import 'package:ini/ini.dart';
+import 'package:path/path.dart';
 import 'package:xdg_desktop/src/ini.dart';
 
 class DesktopEntry {
@@ -59,6 +60,8 @@ class DesktopEntry {
   static const String prefersNonDefaultGpuKey = 'PrefersNonDefaultGPU';
   static const String singleMainWindowKey = 'SingleMainWindow';
 
+  final String id;
+  final String? filePath;
   final DesktopEntryType type;
   final String? version;
   final LocalizedString name;
@@ -89,6 +92,8 @@ class DesktopEntry {
   final List<DesktopEntryAction>? actionSections;
 
   const DesktopEntry({
+    required this.id,
+    this.filePath,
     required this.type,
     this.version,
     required this.name,
@@ -118,7 +123,7 @@ class DesktopEntry {
     this.extra = const {},
   });
 
-  factory DesktopEntry.fromIni(String content) {
+  factory DesktopEntry.fromIni(String filePath, String content) {
     final Config ini = Config.fromString(content);
 
     assert(ini.hasSection(DesktopEntry.defaultSection));
@@ -296,6 +301,8 @@ class DesktopEntry {
     extraOptions.removeWhere((e) => keys.contains(e));
 
     return DesktopEntry(
+      id: basenameWithoutExtension(filePath),
+      filePath: filePath,
       type: type,
       version: version,
       name: name,
@@ -567,6 +574,8 @@ class DesktopEntry {
   }
 
   DesktopEntry copyWith({
+    String? id,
+    String? filePath,
     DesktopEntryType? type,
     String? version,
     LocalizedString? name,
@@ -599,6 +608,8 @@ class DesktopEntry {
     Map<String, String>? extra,
   }) {
     return DesktopEntry(
+      id: id ?? this.id,
+      filePath: filePath ?? this.filePath,
       type: type ?? this.type,
       version: version ?? this.version,
       name: name ?? this.name,

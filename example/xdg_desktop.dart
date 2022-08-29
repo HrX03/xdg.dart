@@ -29,7 +29,7 @@ Future<void> _parseFile(FileSystemEntity entity) async {
 
   final String content = await entity.readAsString();
   try {
-    final DesktopEntry entry = DesktopEntry.fromIni(content);
+    final DesktopEntry entry = DesktopEntry.fromIni(entity.path, content);
     if (entry.noDisplay != true) print(entry.name);
   } catch (e) {
     print(e);
